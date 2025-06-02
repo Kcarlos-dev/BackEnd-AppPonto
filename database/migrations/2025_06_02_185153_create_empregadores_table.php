@@ -11,12 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('empregados', function (Blueprint $table) {
+        Schema::create('empregadores', function (Blueprint $table) {
             $table->id();
             $table->string('senha');
-            $table->string('email');
-            $table->string('cpf',15);
+            $table->string('email')->unique();
+            $table->string('cpf',15)->unique();
             $table->string('nome');
+            $table->string('empresa');
             $table->timestamps();
         });
     }

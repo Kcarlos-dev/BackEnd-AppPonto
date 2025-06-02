@@ -13,12 +13,12 @@ return new class extends Migration
     {
         Schema::create('tabela_pontos', function (Blueprint $table) {
             $table->id();
-            $table->string('cpf');
+            $table->string('cpf')->unique();
             $table->foreign('cpf')
                   ->references('cpf')
                   ->on('funcionarios')
                   ->onDelete('cascade');
-            $table->string('email');
+            $table->string('email')->unique();
             $table->string('hora');
             $table->string('data_ponto');
             $table->timestamps();

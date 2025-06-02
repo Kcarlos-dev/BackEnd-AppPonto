@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('funcionarios', function (Blueprint $table) {
             $table->string('cpf', 15)->primary();
-            $table->string('email');
+            $table->string('email')->unique();
             $table->string('nome');
             $table->string('senha');
             $table->string('EMPREGADOR');
