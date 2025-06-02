@@ -64,20 +64,36 @@ class ApiController extends Controller
     }
     public function exibirEmpregador(Request $request)
     {
-        $email = '';
-        $senha = '';
+        try {
+            $email = '';
+            $senha = '';
 
-        $result = DB::select("SELECT email, senha FROM EMPREGADOR WHERE email =(?)", [$request->email]);
-        foreach ($result as $i) {
-            $email =  $i->email;
-            $senha =  $i->senha;
+            $empregador = new Empregador();
+
+            $result = $empregador::select('email', 'senha')
+                ->where('email', $request->query('email'))
+                ->first();
+
+            if ($result) {
+                $email = $result->email;
+                $senha = $result->senha;
+
+                $dados = [
+                    "email" => $email,
+                    "senha" => password_verify($request->query('senha'), $senha)
+                ];
+            } else {
+                $dados = [
+                    "email" => null,
+                    "senha" => false
+                ];
+            }
+
+            return response()->json($dados);
+        } catch (Throwable $e) {
+            Log::error("Erro exibirEmpregador: " . $e->getMessage());
+            return response()->json(["message" => "Erro interno"], 500);
         }
-        $dados = [
-            "email" => "$email",
-            "senha" => password_verify($request->senha, $senha)
-        ];
-
-        return json_encode($dados);
     }
     public function addFuncionario(Request $request)
     {
@@ -90,6 +106,7 @@ class ApiController extends Controller
         $empregador = $request->empregador;
         $ValidarEmail = DB::select('SELECT email FROM EMPREGADOR
                          WHERE email = (?)', [$empregador]);
+
         if (empty($ValidarEmail)) {
             return 'Email do empregador não consta no banco';
         }

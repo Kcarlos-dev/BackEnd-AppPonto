@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ApiController;
 
 Route::post('/addEmpregador',[ApiController::class,'addEmpregador']);
-Route::post('/exibirEmpregador',[ApiController::class,'exibirEmpregador']);
+Route::get('/exibirEmpregador',[ApiController::class,'exibirEmpregador']);
 Route::post('/addcolaborador', [ApiController::class,'addFuncionario']);
 Route::post('/exibirColaborador', [ApiController::class,'exibirColaborador']);
 Route::post('/enviarcolaborador',[ApiController::class,'enviar']);
