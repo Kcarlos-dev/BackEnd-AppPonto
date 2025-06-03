@@ -188,9 +188,9 @@ class ApiController extends Controller
     public function ReceberPonto(Request $request)
     {
         TabelaPonto::create([
-            'email' => $request->Email,
-            'hora' => $request->Hora,
-            'data_ponto' => $request->Data,
+            'email' => $request->email,
+            'hora' => $request->hora,
+            'data_ponto' => $request->data,
             'cpf' => $request->cpf,
         ]);
 
@@ -222,7 +222,7 @@ class ApiController extends Controller
 
         return json_encode($result);*/
     }
-    public function ColaboradorExpecifico(Request $request)
+    public function FuncionarioExpecifico(Request $request)
     {
         $colaborador = Funcionario::where('email', $request->email)->get();
         return response()->json($colaborador);
