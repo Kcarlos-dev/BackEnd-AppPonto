@@ -182,7 +182,7 @@ class ApiController extends Controller
     }
     public function enviar(Request $request)
     {
-        $usuarios = Funcionario::where('EMPREGADOR', $request->email)->get();
+        $usuarios = Funcionario::where('EMPREGADOR', $request->empresa)->get();
         return response()->json($usuarios);
     }
     public function ReceberPonto(Request $request)
