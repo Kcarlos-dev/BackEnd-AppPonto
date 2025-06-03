@@ -97,22 +97,56 @@ class ApiController extends Controller
     }
     public function addFuncionario(Request $request)
     {
-        $nome = $request->nome;
-        $email = $request->email;
-        $cpf = $request->cpf;
-        $integracao = $request->integracao;
-        $senha = password_hash($request->senha, PASSWORD_DEFAULT);
-        $funcao = $request->funcao;
-        $empregador = $request->empregador;
-        $ValidarEmail = DB::select('SELECT email FROM EMPREGADOR
-                         WHERE email = (?)', [$empregador]);
+        try {
+            $nome = $request->nome;
+            $email = $request->email;
+            $cpf = $request->cpf;
+            $integracao = $request->integracao;
+            $senha = password_hash($request->senha, PASSWORD_DEFAULT);
+            $funcao = $request->funcao;
+            $empresa = $request->empresa;
 
-        if (empty($ValidarEmail)) {
-            return 'Email do empregador não consta no banco';
+
+            if (
+                strlen($nome) <= 0
+                || strlen($email) <= 0
+                || strlen($cpf) <= 0
+                || strlen($senha) <= 0
+                || strlen($integracao) <= 0
+                || strlen($funcao) <= 0
+                || strlen($empresa) <= 0
+            ) {
+                return response()->json(['message' => "Todos os campos devem ser preenchidos"], 400);
+            }
+
+
+            $funcionario = new Funcionario();
+            $empregador = new Empregador();
+
+
+            if (!$empregador::where('empresa', $empresa)->exists()) {
+                return response()->json(
+                    ['message' => 'Empregador não consta no banco'],
+                    422
+                );
+            }
+
+            $funcionario->cpf = $cpf;
+            $funcionario->email = $email;
+            $funcionario->nome = $nome;
+            $funcionario->senha = $senha;
+            $funcionario->EMPREGADOR = $empresa;
+            $funcionario->data_contratacao = $integracao;
+            $funcionario->funcao = $funcao;
+            $funcionario->save();
+
+            //DB::insert('insert into FUNCIONARIOS (nome,email,senha,cpf,data_contratacao,funcao,EMPREGADOR) values(?,?,?,?,?,?,?)', [$nome, $email, $senha, $cpf, $integracao, $funcao, $empregador]);
+            return response()->json(["massage" => "Funcionario cadastrado com sucesso"], 200);
+
+        } catch (Throwable $e) {
+            Log::error("Erro addFuncionario: " . $e->getMessage());
+            return response()->json(["message" => "Erro interno"], 500);
         }
-
-        DB::insert('insert into FUNCIONARIOS (nome,email,senha,cpf,data_contratacao,funcao,EMPREGADOR) values(?,?,?,?,?,?,?)', [$nome, $email, $senha, $cpf, $integracao, $funcao, $empregador]);
-        return "200 => dados recebidos com sucesso";
     }
     public function exibirColaborador(Request $request)
     {
