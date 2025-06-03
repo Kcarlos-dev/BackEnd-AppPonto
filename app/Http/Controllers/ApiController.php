@@ -142,50 +142,66 @@ class ApiController extends Controller
 
             //DB::insert('insert into FUNCIONARIOS (nome,email,senha,cpf,data_contratacao,funcao,EMPREGADOR) values(?,?,?,?,?,?,?)', [$nome, $email, $senha, $cpf, $integracao, $funcao, $empregador]);
             return response()->json(["massage" => "Funcionario cadastrado com sucesso"], 200);
-
         } catch (Throwable $e) {
             Log::error("Erro addFuncionario: " . $e->getMessage());
             return response()->json(["message" => "Erro interno"], 500);
         }
     }
-    public function exibirColaborador(Request $request)
+    public function exibirFuncionario(Request $request)
     {
-        $email = '';
-        $senha = '';
+        try {
+            $email = '';
+            $senha = '';
 
-        $result = DB::select("SELECT email, senha FROM FUNCIONARIOS WHERE email =(?)", [$request->email]);
-        foreach ($result as $i) {
-            $email =  $i->email;
-            $senha =  $i->senha;
+            $funcionario = new Funcionario();
+
+            $result = $funcionario::select('email', 'senha')
+                ->where('email', $request->query('email'))
+                ->first();
+
+            if ($result) {
+                $email = $result->email;
+                $senha = $result->senha;
+
+                $dados = [
+                    "email" => $email,
+                    "senha" => password_verify($request->query('senha'), $senha)
+                ];
+            } else {
+                $dados = [
+                    "email" => null,
+                    "senha" => false
+                ];
+            }
+
+            return response()->json($dados);
+        } catch (Throwable $e) {
+            Log::error("Erro exibirFuncionario: " . $e->getMessage());
+            return response()->json(["message" => "Erro interno"], 500);
         }
-        $dados = [
-            "email" => "$email",
-            "senha" => password_verify($request->senha, $senha)
-        ];
-
-        return json_encode($dados);
     }
     public function enviar(Request $request)
     {
-        $users = DB::select('SELECT * from FUNCIONARIOS
-                                WHERE EMPREGADOR = (?)', [$request->email]);
-
-        return json_encode($users);
+        $usuarios = Funcionario::where('EMPREGADOR', $request->email)->get();
+        return response()->json($usuarios);
     }
     public function ReceberPonto(Request $request)
     {
-        $email = $request->Email;
-        $hora = $request->Hora;
-        $data = $request->Data;
-        $cpf = $request->cpf;
-        DB::insert('insert into TabelaPontos (email,hora,data_ponto,cpf) values(?,?,?,?)', [$email, $hora, $data, $cpf]);
+        TabelaPonto::create([
+            'email' => $request->Email,
+            'hora' => $request->Hora,
+            'data_ponto' => $request->Data,
+            'cpf' => $request->cpf,
+        ]);
 
-        return "200 => dados recebidos com sucesso";
+        return response()->json(['message' => 'Dados recebidos com sucesso'], 200);
     }
+
 
     public function GerarRelatorio(Request $request)
     {
-        $email = $request->email;
+         return response()->json(['message' => 'teste'], 200);
+      /*  $email = $request->email;
         $data = $request->data;
         if ($data == "") {
             $data = '';
@@ -204,35 +220,20 @@ class ApiController extends Controller
             ];
         }
 
-        return json_encode($result);
+        return json_encode($result);*/
     }
     public function ColaboradorExpecifico(Request $request)
     {
-        $email = $request->email;
-        $result = DB::select("
-        SELECT * FROM FUNCIONARIOS
-        WHERE
-        email = (?)
-    ", [$email]);
-
-        return json_encode($result);
+        $colaborador = Funcionario::where('email', $request->email)->get();
+        return response()->json($colaborador);
     }
+
     public function Excluir(Request $request)
     {
-        $email = $request->email;
-        $cpf = $request->cpf;
-        $result = DB::delete(
-            "
-        DELETE FROM FUNCIONARIOS
-        WHERE email = (?)
-        AND cpf = (?)",
-            [$email, $cpf]
-        );
+        $deleted = Funcionario::where('email', $request->email)
+            ->where('cpf', $request->cpf)
+            ->delete();
 
-        if ($result == 0) {
-            $result = "Nada";
-        };
-
-        return $result;
+        return $deleted ? $deleted : 'Nada';
     }
 }

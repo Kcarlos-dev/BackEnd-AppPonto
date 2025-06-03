@@ -6,8 +6,8 @@ use App\Http\Controllers\ApiController;
 
 Route::post('/addEmpregador',[ApiController::class,'addEmpregador']);
 Route::get('/exibirEmpregador',[ApiController::class,'exibirEmpregador']);
-Route::post('/addcolaborador', [ApiController::class,'addFuncionario']);
-Route::post('/exibirColaborador', [ApiController::class,'exibirColaborador']);
+Route::post('/addFuncionario', [ApiController::class,'addFuncionario']);
+Route::get('/exibirFuncionario', [ApiController::class,'exibirFuncionario']);
 Route::post('/enviarcolaborador',[ApiController::class,'enviar']);
 Route::post('/ColaboradorExpecifico',[ApiController::class,'ColaboradorExpecifico']);
 Route::post('/ReceberPonto', [ApiController::class,'ReceberPonto']);
